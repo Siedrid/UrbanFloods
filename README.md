@@ -19,7 +19,7 @@ This practice uses the underlying algorithm called FLEXTH together with flood de
 
 The practice is successfull for large floods, i. e. with an input flood raster with enough pixels classified as flood, as the propagation distance is a function of the area of the original flooded area.
 
-## 2. Enhancing GFM derived Flood maps with DTMs and Sentinel-2 water masks (S1_S2)
+## 2. Enhancing GFM derived Flood maps with DTMs and Sentinel-2 (S1_S2)
 This method builds on the previously used algorithm FLEXTH by not only using the GFM flood delineation, but also including a Sentinel-2 flood map. As optical data has major limitations during floodings, because of clouds, the method uses two incomplete flood maps, merges them, and propagates the flood into the area, where both sensors are insensitive to water.
 In that way, the previously mentioned method can be improved, especially if GFM underestimates the flooded area.
 
