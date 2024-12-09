@@ -24,18 +24,26 @@ gdal.UseExceptions()
 print('Libraries loaded')
 
 #%% INPUT
+# Unzipd Download Folder from Google Drive:
 gee_dir = Path(r"C:/UrbanFloods/Colombia/Colombia_GEE_S2/") # export all rasters into one drive folder
+# Unziped Download Folder from GFM:
 gfm_dir = Path(r"C:/UrbanFloods/Colombia/colombia_2024-11-17T22_59_38_2024_11_25T10_39_19_564885/")
+# output folder in the same directory:
 output_dir = Path(r"C:/UrbanFloods/Colombia/output_S1S2/")
-  
+
+# Checkpoint, if all files are in the gee_dir
+required_files = ['flooded.tif', 'FABDEM.tif', 'cloud_mask.tif']
+missing_files = [file for file in required_files if not os.path.isfile(gee_dir / file)]
+
+# Check if any file is missing
+if missing_files:
+    print(f"Please check that the following files are stored in the gee_dir: {', '.join(required_files)}")
+    print('You specified the following path as directory for the Google Earth Engine Output:')
+    print(gee_dir)
+
+# For GFM dir as well 
 dst_crs = 'EPSG:3857'
 roi_path = 'C:/UrbanFloods/Colombia/colombia_roi.gpkg'
-
-# folder for intermediate processing results
-proc_dir = output_dir / 'proc'
-if not os.path.exists(proc_dir):
-    os.makedirs(proc_dir)
-input_dir = proc_dir
 
 likelihood = True # True, if likelihood layer should be used as flood layer
 likelihood_threshold = 40 # in Percent
@@ -78,6 +86,13 @@ param_distance_range            =  5     # A_1/2: flooded areas of this size (km
 param_WD_star                   =  10    # WD*: dummy water depth in cm assigned if estimated WL<DTM in initially delineated flooded areas
 
 #%% Mosaicing 
+
+# folder for intermediate processing results
+proc_dir = output_dir / 'proc'
+if not os.path.exists(proc_dir):
+    os.makedirs(proc_dir)
+input_dir = proc_dir
+
 def mosaic_tiles(input_dir, pattern):
     id = pattern.split('_')[1].split('*')[0]
     q = os.path.join(input_dir, pattern)
@@ -100,7 +115,7 @@ def mosaic_tiles(input_dir, pattern):
                      }
                   )
     
-    with rasterio.open(input_dir / id +'_mosaic.tif', "w", **out_meta) as dest:
+    with rasterio.open(str(input_dir) + '/' + id +'_mosaic.tif', "w", **out_meta) as dest:
         dest.write(mosaic)
 
 # File Path Patterns
@@ -119,7 +134,7 @@ for i in range(len(lyr_ids)):
 if dst_crs == 'none':
     dst_crs = 'EPSG:3857'
 
-# Threshold the Uncertainty layer
+## Threshold the Uncertainty layer
 if likelihood == True:
     with rasterio.open(gfm_dir / 'UNCERTAINTY_mosaic.tif') as src:
         rst = src.read(1)
@@ -956,20 +971,23 @@ def flood_processing(flood_path, dtm_path, exclusion_path, obswater_path, perman
 def FLEXTH_stats():
     with (
     rasterio.open(
-        #output_dir / f'_WL_flood_{param_WL_estimation_method}_Smax_{param_threshold_slope}_Nmax_{param_max_number_neighbors}_a_{param_inverse_dist_exp}_Dmax_{param_max_propagation_distance}_A12_{param_distance_range}_gaps_{param_size_gaps_close}.tif'
-        output_dir / 'WD_method_A_Smax_0.2_Nmax_100_a_1_Dmax_10_A12_3_gaps_0.05.tif'
-            ) as src,
+        output_dir / f'FLOOD_{param_WL_estimation_method}_Smax_{param_threshold_slope}_Nmax_{param_max_number_neighbors}_a_{param_inverse_dist_exp}_Dmax_{param_max_propagation_distance}_A12_{param_distance_range}_gaps_{param_size_gaps_close}.tif',
+            ) as src, # Processed Flood
     rasterio.open(
-        input_dir / 'flood.tif') as src2
+        input_dir / 'flood.tif') as src2, # initial flood (S1 and S2)
+    rasterio.open(
+        gee_dir / 'flooded.tif') as src3 # initial Sentinel-2 flood
     ):
         flexth_rst = src.read(1)
         initial_flood = src2.read(1)
+        S2_flood = src3.read(1)
 
         pixel_width, pixel_height = src.res  
         pixel_area = abs(pixel_width * pixel_height) 
         
-        mask = (flexth_rst > 10) & (flexth_rst != 9999)
+        mask = (flexth_rst == 1)
         initial_flood_area = (initial_flood == 1)
+        S_2_before = (S2_flood == 1)
 
         count_after = np.sum(mask)
         count_before = np.sum(initial_flood_area)
@@ -977,13 +995,10 @@ def FLEXTH_stats():
         # Calculate the total area
         total_area_after = np.round((count_after * pixel_area) / 1000000, decimals = 2)
         total_area_before = np.round((count_before * pixel_area) / 1000000, decimals = 2)
+        S_2_before = np.round((np.sum(S_2_before) * pixel_area) / 1000000, decimals = 2)
         
         print(f'Initial Flooded Area: {total_area_before}km2\nFlooded Area with FLEXTH: {total_area_after}km2')
-        
-        # Plotting
-        fig, (ax_before, ax_after) = pyplot.subplots(1,2,figsize = (14, 7))
-        show(src2, ax=ax_before)
-        show(src, ax=ax_after)
+ 
 
 # Function to Plot the Map of the flooded area
 # Plot Histogramm of water depths
@@ -1059,4 +1074,4 @@ if __name__ == '__main__':
 
     end = time.time()
     print(f'Total processing time: {int((end - start)/60)} minutes')
-
+    FLEXTH_stats()
