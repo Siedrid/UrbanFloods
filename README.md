@@ -19,9 +19,13 @@ This practice uses the underlying algorithm called FLEXTH together with flood de
 
 The practice is successfull for large floods, i. e. with an input flood raster with enough pixels classified as flood, as the propagation distance is a function of the area of the original flooded area.
 
+<img src="S1/Maps/SriLanka-FLEXTH.png" alt="FLEXTH analysis for Flooding in Sri Lanka" style="width: 400px;"/>
+
 ## 2. Enhancing GFM derived Flood maps with DTMs and Sentinel-2 (S1_S2)
 This method builds on the previously used algorithm FLEXTH by not only using the GFM flood delineation, but also including a Sentinel-2 flood map. As optical data has major limitations during floodings, because of clouds, the method uses two incomplete flood maps, merges them, and propagates the flood into the area, where both sensors are insensitive to water.
 In that way, the previously mentioned method can be improved, especially if GFM underestimates the flooded area.
+
+<img src="S1_S2/Maps/Colombia_S1S2.png" alt="FLEXTH analysis for Flooding in Colombia" style="width: 400px;"/>
 
 ## 3. Flood Mapping and Damage Assessment in Urban Areas with Sentinel-1 Interferometric Coherence (S1_Coherence)
 Especially in dense urban areas, conventional methods using Sentinel-1 and Sentinel-2 imagery to detect water are challenged by urban structures. Even if single flood pixels are detected inside the urban areas, also FLEXTH can not reconstruct the area affected with the DTM, as propagation distance is a function of the flooded pixels.
@@ -29,6 +33,7 @@ Especially in dense urban areas, conventional methods using Sentinel-1 and Senti
 Also certain types of floods, like flash floods, when water does not remain inside the city, but drains quickly and leaves nothing but damage, can not be detected with either optical (because of the clouds) or radar satellites (because of the dominance of vertical structures inside urban areas).
 This is where SAR Interferometric Coherence comes in, which can be calcluated from Single Look Complex (SLC) Radar data, which is a certain type of radar imagery. SAR interferometry considers not only the intensity (i.e. the amplitude) of the SAR signal, but also the phase information. For more information, please find the documentation in the respective folder.
 
+<img src="S1_Coherence/Maps/Valencia_COH.png" alt="Coherence Change Analysis for Flooding in Valencia" style="width: 400px;"/>
 
 ### References
 Hawker, Laurence; Uhe, Peter; Paulo, Luntadila; Sosa, Jeison; Savage, James; Sampson, Christopher; Neal, Jeffrey (2022): A 30 m global map of elevation with forests and buildings removed. In Environ. Res. Lett. 17 (2), p. 24016. DOI: 10.1088/1748-9326/ac4d4f.
