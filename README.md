@@ -1,6 +1,6 @@
 # Mapping Floods in Urban Areas
 
-Hydrometeorological hazards make up for the majority of natural disasters. They go together with a high number of cacualties and economic damage. As most human and economic damage is done inside urban areas, these are the most vulnerable regions and need urgently data in form of maps for the response forces in case of disaster. 
+Hydrometeorological hazards make up for the majority of natural disasters. They go together with a high number of casualties and economic damage. As most human and economic damage is done inside urban areas, these are the most vulnerable regions and need urgently data in form of maps for the response forces in case of disaster. 
 This repository gives multiple options to create and improve flood maps in urban areas. The underlying methods were developed and published by scientist from JRC and LIST.
 
 From the methodologies I developed these step-by-step guides during my work at UN-SPIDER in Bonn, which are ment to facilitate access to space based disaster response to the non-scientific community. The guides are planed to serve as new "Recommended Practices" for flood mapping to the UN-SPIDER knowledge portal: https://www.un-spider.org/advisory-support/recommended-practices
